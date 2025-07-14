@@ -117,7 +117,7 @@ All endpoints are prefixed with `/api`.
 | Files        | `POST /api/files/upload`, ...                  |
 | Admin/Stats  | `GET /api/admin/health`, `/api/stats/*`        |
 
-➡️ **See [`CMMS API Documentation.md`](#) for a full list of endpoints.**
+➡️ **See [`CMMS API Documentation.md`](CMMS API Documentation.md) for a full list of endpoints.**
 
 ---
 
