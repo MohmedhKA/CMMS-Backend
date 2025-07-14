@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: cmms_postgres
+    environment:
+      POSTGRES_DB: cmms_db
+      POSTGRES_USER: cmms_user
+      POSTGRES_PASSWORD: cmms_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - cmms_network
+
+  # Redis for caching and session storage
+  redis:
+    image: redis:7-alpine
+    container_name: cmms_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - cmms_network
+
+  # CMMS Backend API
+  api:
+    build: .
+    container_name: cmms_api
+    environment:
+      NODE_ENV: development
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: cmms_db
+      DB_USER: cmms_user
+      DB_PASSWORD: cmms_password
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./src:/app/src
+      - ./uploads:/app/uploads
+      - ./logs:/app/logs
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - cmms_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  cmms_network:
+    driver: bridge
+
